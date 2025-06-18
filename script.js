@@ -1,29 +1,29 @@
-//your JS code here. If required.
-const app = document.getElementById('app');
 const video = document.querySelector('.vid-container video');
+const audio = document.getElementById('meditation-audio');
 const playBtn = document.querySelector('.play');
 const timeDisplay = document.querySelector('.time-display');
-const timeButtons = document.querySelectorAll('#time-select button');
+const timeButtons = document.querySelectorAll('.time-select button');
 const soundPicker = document.querySelectorAll('.sound-picker button');
 
-let currentSound = new Audio('Sounds/beach.mp3');
-let fakeDuration = 600; // 10 mins
+let fakeDuration = 600; // default 10 min
 let timer;
 let isPlaying = false;
 
+// ⏯️ Play/Pause Button
 playBtn.addEventListener('click', () => {
   if (isPlaying) {
-    currentSound.pause();
+    audio.pause();
     clearInterval(timer);
     playBtn.innerHTML = `<img src="https://img.icons8.com/ios-filled/50/play--v1.png" width="40"/>`;
   } else {
-    currentSound.play();
+    audio.play();
     timer = startTimer(fakeDuration);
     playBtn.innerHTML = `<img src="https://img.icons8.com/ios-filled/50/pause--v1.png" width="40"/>`;
   }
   isPlaying = !isPlaying;
 });
 
+// ⏲️ Time Selection
 timeButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     const id = btn.id;
@@ -32,25 +32,29 @@ timeButtons.forEach(btn => {
     if (id === 'long-mins') fakeDuration = 600;
 
     timeDisplay.textContent = `${Math.floor(fakeDuration / 60)}:0`;
-    if (isPlaying) {
-      currentSound.pause();
-      currentSound.currentTime = 0;
-      clearInterval(timer);
-      playBtn.innerHTML = `<img src="https://img.icons8.com/ios-filled/50/play--v1.png" width="40"/>`;
-      isPlaying = false;
-    }
+    audio.pause();
+    audio.currentTime = 0;
+    clearInterval(timer);
+    playBtn.innerHTML = `<img src="https://img.icons8.com/ios-filled/50/play--v1.png" width="40"/>`;
+    isPlaying = false;
   });
 });
 
+// 🔄 Switch Sound/Video
 soundPicker.forEach(btn => {
   btn.addEventListener('click', () => {
     const soundSrc = btn.getAttribute('data-sound');
     const videoSrc = btn.getAttribute('data-video');
-    currentSound.pause();
-    currentSound = new Audio(soundSrc);
-    video.src = videoSrc;
+
+    audio.pause();
+    audio.querySelector('source').src = soundSrc;
+    audio.load();
+
+    video.querySelector('source').src = videoSrc;
+    video.load();
+
     if (isPlaying) {
-      currentSound.play();
+      audio.play();
     }
   });
 });
@@ -63,8 +67,8 @@ function startTimer(duration) {
     timeLeft--;
     if (timeLeft < 0) {
       clearInterval(timer);
-      currentSound.pause();
-      currentSound.currentTime = 0;
+      audio.pause();
+      audio.currentTime = 0;
       playBtn.innerHTML = `<img src="https://img.icons8.com/ios-filled/50/play--v1.png" width="40"/>`;
       isPlaying = false;
       return;
